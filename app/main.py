@@ -1,12 +1,21 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
+from app.utils.image_processor import ImageProcessor
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Create FastAPI app instance
 app = FastAPI(
     title="Fashion Design Analysis API",
     description="API for analyzing fashion items using AI",
-    version="0.1.0"
+    version="0.2.0"
 )
+
+# Initialize image processor
+image_processor = ImageProcessor()
 
 
 @app.get("/")
@@ -19,10 +28,6 @@ async def root():
     }
 
 
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy"}
 
 
 @app.post("/analyze")
@@ -34,13 +39,15 @@ async def analyze_image(file: UploadFile = File(...)):
         file: Image file (JPEG, PNG, etc.)
     
     Returns:
-        JSON with filename and basic info
+        JSON with image info and validation results
     """
+    logger.info(f"Received file: {file.filename}")
+    
     # Check if file was provided
     if not file:
         raise HTTPException(status_code=400, detail="No file provided")
     
-    # Check if it's an image
+    # Check if it's an image (basic check)
     if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(
             status_code=400, 
@@ -54,11 +61,20 @@ async def analyze_image(file: UploadFile = File(...)):
     if len(contents) == 0:
         raise HTTPException(status_code=400, detail="Empty file provided")
     
-    # For now, just return basic info (we'll add AI analysis in Step 4)
+    # Validate and process image with Pillow
+    image_info = image_processor.validate_and_process(contents, file.filename)
+    
+    # Return detailed image information
     return {
         "status": "success",
         "filename": file.filename,
         "content_type": file.content_type,
-        "size_bytes": len(contents),
-        "message": "File uploaded successfully. AI analysis coming in Step 4!"
+        "dimensions": {
+            "width": image_info["width"],
+            "height": image_info["height"]
+        },
+        "format": image_info["format"],
+        "mode": image_info["mode"],
+        "size_bytes": image_info["size_bytes"],
+        "message": "Image validated successfully. AI analysis coming in Step 4!"
     }
