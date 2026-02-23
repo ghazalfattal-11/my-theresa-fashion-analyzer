@@ -191,8 +191,8 @@ Automatically extracting data from websites. We'll scrape fashion images from my
 ## 🎓 Current Status
 
 - ✅ Step 1: Basic FastAPI Setup
-- ⏳ Step 2: Add File Upload (NEXT)
-- ⬜ Step 3: Image Processing
+- ✅ Step 2: Add File Upload
+- ⏳ Step 3: Image Processing (NEXT)
 - ⬜ Step 4: AWS Bedrock Integration
 - ⬜ Step 5: Web Scraping Basics
 - ⬜ Step 6: Advanced Scraping

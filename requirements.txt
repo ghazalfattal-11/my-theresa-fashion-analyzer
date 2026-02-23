@@ -1,3 +1,5 @@
 # Step 1: Basic FastAPI setup
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
+# Step 2: File upload support
+python-multipart==0.0.6

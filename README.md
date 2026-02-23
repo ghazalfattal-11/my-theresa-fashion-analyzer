@@ -27,6 +27,7 @@ This project is built step-by-step. See **ARCHITECTURE.md** for:
 ## 📊 Current Progress
 
 ✅ Step 1: Basic FastAPI Setup
+✅ Step 2: File Upload with Validation
 
 ## 🎯 Project Requirements
 
