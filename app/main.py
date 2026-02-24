@@ -1,7 +1,13 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from app.utils.image_processor import ImageProcessor
+from app.services.bedrock_service import BedrockService
+from dotenv import load_dotenv
 import logging
+from io import BytesIO
+
+# Load environment variables
+load_dotenv()
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -11,11 +17,12 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Fashion Design Analysis API",
     description="API for analyzing fashion items using AI",
-    version="0.2.0"
+    version="0.3.0"
 )
 
-# Initialize image processor
+# Initialize services
 image_processor = ImageProcessor()
+bedrock_service = BedrockService()
 
 
 @app.get("/")
@@ -33,13 +40,13 @@ async def root():
 @app.post("/analyze")
 async def analyze_image(file: UploadFile = File(...)):
     """
-    Upload an image file for analysis.
+    Upload and analyze a fashion item image using AI.
     
     Args:
         file: Image file (JPEG, PNG, etc.)
     
     Returns:
-        JSON with image info and validation results
+        JSON with image info and AI-generated fashion analysis
     """
     logger.info(f"Received file: {file.filename}")
     
@@ -62,19 +69,43 @@ async def analyze_image(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Empty file provided")
     
     # Validate and process image with Pillow
-    image_info = image_processor.validate_and_process(contents, file.filename)
+    try:
+        image_info = image_processor.validate_and_process(contents, file.filename)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Image processing error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process image")
     
-    # Return detailed image information
-    return {
-        "status": "success",
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "dimensions": {
-            "width": image_info["width"],
-            "height": image_info["height"]
-        },
-        "format": image_info["format"],
-        "mode": image_info["mode"],
-        "size_bytes": image_info["size_bytes"],
-        "message": "Image validated successfully. AI analysis coming in Step 4!"
-    }
+    # Analyze with AWS Bedrock
+    try:
+        # Convert PIL image to bytes for Bedrock
+        img_byte_arr = BytesIO()
+        image_info["image"].save(img_byte_arr, format='JPEG')
+        img_byte_arr = img_byte_arr.getvalue()
+        
+        # Get AI analysis
+        analysis = bedrock_service.analyze_fashion_item(img_byte_arr)
+        
+        # Return complete response
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "image_info": {
+                "dimensions": {
+                    "width": image_info["width"],
+                    "height": image_info["height"]
+                },
+                "format": image_info["format"],
+                "mode": image_info["mode"],
+                "size_bytes": image_info["size_bytes"]
+            },
+            "analysis": analysis
+        }
+    
+    except Exception as e:
+        logger.error(f"Bedrock analysis error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"AI analysis failed: {str(e)}"
+        )
