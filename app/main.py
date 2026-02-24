@@ -5,6 +5,7 @@ from app.services.bedrock_service import BedrockService
 from dotenv import load_dotenv
 import logging
 from io import BytesIO
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
@@ -16,8 +17,8 @@ logger = logging.getLogger(__name__)
 # Create FastAPI app instance
 app = FastAPI(
     title="Fashion Design Analysis API",
-    description="API for analyzing fashion items using AI",
-    version="0.3.0"
+    description="Upload fashion images for AI-powered analysis using AWS Bedrock",
+    version="1.0.0"
 )
 
 # Initialize services
@@ -29,9 +30,56 @@ bedrock_service = BedrockService()
 async def root():
     """Root endpoint - API welcome message"""
     return {
-        "message": "Welcome to Fashion Design Analysis API",
-        "version": "0.1.0",
-        "docs": "/docs"
+        "message": "Fashion Design Analysis API",
+        "version": "1.0.0",
+        "endpoints": {
+            "docs": "/docs",
+            "health": "/health",
+            "scraped_images": "/scraped-images",
+            "analyze": "/analyze (POST)"
+        },
+        "description": "Upload fashion images from scraped data for detailed AI analysis"
+    }
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "bedrock_configured": bedrock_service.client is not None
+    }
+
+
+@app.get("/scraped-images")
+async def list_scraped_images():
+    """
+    List all scraped images available for analysis.
+    
+    Returns:
+        Dictionary with categories and image counts
+    """
+    images_dir = Path("scraper/data")
+    
+    if not images_dir.exists():
+        return {
+            "message": "No scraped images found. Run scrape_and_save.py first.",
+            "categories": {}
+        }
+    
+    categories = {}
+    for category_dir in images_dir.iterdir():
+        if category_dir.is_dir():
+            images = list(category_dir.glob("*.jpg")) + list(category_dir.glob("*.png"))
+            categories[category_dir.name] = {
+                "count": len(images),
+                "sample_files": [img.name for img in images[:5]]
+            }
+    
+    return {
+        "total_images": sum(cat["count"] for cat in categories.values()),
+        "categories": categories,
+        "location": str(images_dir)
     }
 
 
