@@ -1,11 +1,12 @@
 """
 Automated scraping engine for mytheresa.com
 One-click script to scrape all required images and save to disk.
+Uses HTTP-based API scraping - NO SELENIUM REQUIRED!
 """
 
 import logging
 import time
-from scraper.mytheresa_scraper import MytheresaScraper
+from scraper.mytheresa_api_scraper import MytheresaAPIScraper
 from scraper.image_downloader import ImageDownloader
 from scraper.config import IMAGES_DIR
 
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 def scrape_and_save_category(
-    scraper: MytheresaScraper,
+    scraper: MytheresaAPIScraper,
     downloader: ImageDownloader,
     scrape_func,
     category: str,
@@ -27,7 +28,7 @@ def scrape_and_save_category(
     Scrape a category and save images to disk.
     
     Args:
-        scraper: MytheresaScraper instance
+        scraper: MytheresaAPIScraper instance
         downloader: ImageDownloader instance
         scrape_func: Function to call for scraping
         category: Category name
@@ -38,7 +39,7 @@ def scrape_and_save_category(
     print(f"{'='*70}")
     
     # Step 1: Scrape URLs
-    logger.info(f"Step 1/2: Scraping URLs from mytheresa.com...")
+    logger.info(f"Step 1/2: Scraping URLs from mytheresa.com API...")
     items = scrape_func(limit)
     
     if not items:
@@ -67,7 +68,7 @@ def scrape_and_save_category(
             logger.info(f"Progress: {i}/{len(items)} processed, {downloaded} saved")
         
         # Small delay to be polite
-        time.sleep(0.3)
+        time.sleep(0.1)  # Reduced delay since we're using API
     
     logger.info(f"✓ COMPLETE: {downloaded}/{len(items)} images saved to scraper/data/{category}/")
     print(f"\n✓ {category}: {downloaded} images saved")
@@ -78,6 +79,7 @@ def main():
     
     print("=" * 70)
     print("MYTHERESA AUTOMATED SCRAPING ENGINE")
+    print("HTTP-Based API Scraping - Fast & Efficient!")
     print("=" * 70)
     print(f"\nImages will be saved to: {IMAGES_DIR}")
     print("\nRequirements:")
@@ -89,8 +91,8 @@ def main():
     print("\nStarting in 3 seconds...")
     time.sleep(3)
     
-    # Initialize components
-    scraper = MytheresaScraper(headless=True)
+    # Initialize components 
+    scraper = MytheresaAPIScraper()
     downloader = ImageDownloader()
     
     # Define scraping tasks
@@ -102,8 +104,7 @@ def main():
         (scraper.scrape_men_shoes, "men_shoes", 100),
     ]
     
-    # Execute all tasks
-    total_downloaded = 0
+    #total_downloaded = 0
     for scrape_func, category, limit in tasks:
         try:
             scrape_and_save_category(
