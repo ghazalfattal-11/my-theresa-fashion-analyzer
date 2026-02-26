@@ -152,6 +152,7 @@ python -m pip install -r requirements.txt
 - `httpx` - HTTP client for API scraping
 - `boto3` - AWS Bedrock integration
 - `pillow` - Image processing
+- `streamlit` - Web interface
 
 **No longer needed:**
 - ~~selenium~~ - Removed!
@@ -167,7 +168,7 @@ AWS_REGION=us-east-1
 BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
 ```
 
-### 3. Run Scraping Engine
+### 3. Run Scraping Engine (Optional)
 
 ```bash
 python scrape_and_save.py
@@ -181,15 +182,34 @@ This will:
 
 **No browser needed!** 🎉
 
-### 4. Start FastAPI Server
+### 4. Launch the Application
 
+**Quick Start (Recommended):**
+```bash
+python start_app.py
+```
+
+This single command will:
+- Start the FastAPI backend server
+- Launch the Streamlit web interface
+- Open both in your browser automatically
+
+**Or start services individually:**
+
+FastAPI backend only:
 ```bash
 python -m uvicorn app.main:app --reload
 ```
 
-### 5. Use the API
+Streamlit frontend only:
+```bash
+streamlit run frontend/app.py
+```
 
-Visit http://127.0.0.1:8000/docs
+### 5. Use the Application
+
+- **Web Interface:** http://localhost:8501 (Streamlit)
+- **API Documentation:** http://127.0.0.1:8000/docs (FastAPI)
 
 **Endpoints:**
 - `GET /` - API information
@@ -366,6 +386,3 @@ print(f"Scraped {len(results)} products")
 - AWS Bedrock requires valid credentials
 - Images are saved locally for API use
 
-## License
-
-For internship/educational purposes.
