@@ -104,7 +104,8 @@ def main():
         (scraper.scrape_men_shoes, "men_shoes", 100),
     ]
     
-    #total_downloaded = 0
+    # Execute all tasks
+    total_downloaded = 0
     for scrape_func, category, limit in tasks:
         try:
             scrape_and_save_category(
