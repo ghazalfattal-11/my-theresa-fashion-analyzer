@@ -115,6 +115,30 @@ python -m uvicorn app.main:app --reload
 
 **Access:** http://127.0.0.1:8000/docs
 
+### 3. Streamlit Web Interface (NEW! 🎉)
+
+**Purpose:** Beautiful, user-friendly web UI for image analysis
+
+**Features:**
+- 🖼️ Drag-and-drop image upload
+- 🤖 Real-time AI analysis
+- 📊 Scraped images gallery
+- 📈 Statistics dashboard
+- 🎨 Modern, responsive design
+
+**Usage:**
+```bash
+# Start the frontend
+streamlit run frontend/app.py
+```
+
+**Access:** http://localhost:8501
+
+**Or start everything at once:**
+```bash
+python start_app.py
+```
+
 ## Setup
 
 ### 1. Install Dependencies
