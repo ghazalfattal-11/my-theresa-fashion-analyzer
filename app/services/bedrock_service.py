@@ -18,21 +18,24 @@ class BedrockService:
         aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
         aws_region = os.getenv("AWS_REGION", "us-east-1")
         
-        # Check if credentials are provided
-        if not aws_access_key or not aws_secret_key:
-            logger.warning("AWS credentials not found in environment variables")
-            self.client = None
-            return
-        
         # Create Bedrock client
         try:
-            self.client = boto3.client(
-                service_name="bedrock-runtime",
-                region_name=aws_region,
-                aws_access_key_id=aws_access_key,
-                aws_secret_access_key=aws_secret_key
-            )
-            logger.info(f"Bedrock client initialized for region: {aws_region}")
+            # If credentials are provided in .env, use them
+            if aws_access_key and aws_secret_key:
+                self.client = boto3.client(
+                    service_name="bedrock-runtime",
+                    region_name=aws_region,
+                    aws_access_key_id=aws_access_key,
+                    aws_secret_access_key=aws_secret_key
+                )
+                logger.info(f"Bedrock client initialized with .env credentials for region: {aws_region}")
+            else:
+                # Otherwise use default AWS credentials (from aws configure)
+                self.client = boto3.client(
+                    service_name="bedrock-runtime",
+                    region_name=aws_region
+                )
+                logger.info(f"Bedrock client initialized with default AWS credentials for region: {aws_region}")
         except Exception as e:
             logger.error(f"Failed to initialize Bedrock client: {str(e)}")
             self.client = None

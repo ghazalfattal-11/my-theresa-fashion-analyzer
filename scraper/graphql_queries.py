@@ -43,7 +43,7 @@ def build_listing_variables(
     size: int = 60,
     sort: str = None,
     filters: str = ""
-) -> dict:
+  ) -> dict:
     """
     Build variables for product listing query
     

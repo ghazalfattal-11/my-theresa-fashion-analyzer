@@ -23,7 +23,7 @@ def scrape_and_save_category(
     scrape_func,
     category: str,
     limit: int
-):
+    ):
     """
     Scrape a category and save images to disk.
     

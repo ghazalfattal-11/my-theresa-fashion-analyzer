@@ -43,6 +43,7 @@ st.markdown("""
         padding: 1.5rem;
         border-radius: 0.5rem;
         margin-top: 1rem;
+        color: #262730;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -134,8 +135,7 @@ with tab1:
                             
                             # Display analysis
                             st.markdown("### 🤖 AI Analysis")
-                            st.markdown(f"<div class='result-box'>{result['analysis']}</div>", 
-                                      unsafe_allow_html=True)
+                            st.markdown(result['analysis'])
                             
                             # Display image info
                             with st.expander("📊 Technical Details"):

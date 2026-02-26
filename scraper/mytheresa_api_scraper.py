@@ -29,7 +29,7 @@ class MytheresaAPIScraper:
         brand_filter: Optional[str] = None,
         max_price: Optional[float] = None,
         section: Optional[str] = None
-    ) -> List[Dict]:
+        ) -> List[Dict]:
         """
         Scrape products from a category
         
@@ -90,7 +90,7 @@ class MytheresaAPIScraper:
         category_slug: str, 
         page: int, 
         section: str
-    ) -> List[Product]:
+        ) -> List[Product]:
         """
         Fetch a single page of products
         
