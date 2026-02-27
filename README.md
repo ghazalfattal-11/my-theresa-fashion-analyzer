@@ -160,14 +160,18 @@ python -m pip install -r requirements.txt
 
 ### 2. Configure AWS Credentials
 
-Create `.env` file:
+**Option 1: AWS CLI Configuration (Recommended)**
+```bash
+aws configure 
+```
+
+**Option 2: Create `.env`  file**
 ```env
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 AWS_REGION=us-east-1
 BEDROCK_MODEL_ID=anthropic.claude-3-sonnet-20240229-v1:0
 ```
-
 ### 3. Run Scraping Engine (Optional)
 
 ```bash
@@ -361,28 +365,3 @@ scraper = MytheresaAPIScraper()
 results = scraper.scrape_men_clothing(limit=5)
 print(f"Scraped {len(results)} products")
 ```
-
-## Performance Comparison
-
-### Old Selenium Approach:
-- ⏱️ Time: 1-2 hours for 1,170 images
-- 💾 Memory: ~500MB
-- 🖥️ Requires: Chrome browser + ChromeDriver
-- 🐛 Issues: Element timeouts, browser crashes
-
-### New HTTP API Approach:
-- ⚡ Time: 10-15 minutes for 1,170 images
-- 💾 Memory: ~50MB
-- 🖥️ Requires: Nothing extra!
-- ✅ Reliable: Direct API calls
-
-**Result: 6-8x faster!** 🚀
-
-## Notes
-
-- Scraping is now much faster (HTTP vs browser)
-- No browser installation needed
-- Respect mytheresa.com's servers (built-in delays)
-- AWS Bedrock requires valid credentials
-- Images are saved locally for API use
-

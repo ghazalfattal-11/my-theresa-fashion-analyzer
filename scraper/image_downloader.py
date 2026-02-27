@@ -35,7 +35,7 @@ class ImageDownloader:
         category: str, 
         filename: str,
         timeout: int = 10
-    ) -> Optional[str]:
+     ) -> Optional[str]:
         """
         Download image from URL and save to disk.
         
