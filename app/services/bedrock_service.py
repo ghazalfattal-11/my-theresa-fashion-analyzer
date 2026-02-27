@@ -12,36 +12,41 @@ class BedrockService:
     """Service for interacting with AWS Bedrock AI models"""
     
     def __init__(self):
-        """Initialize Bedrock client with AWS credentials"""
-        # Get AWS credentials from environment variables
+        """Initialize Bedrock service"""
+        logger.info("Bedrock service initialized")
+    
+    @property
+    def client(self):
+        """Create a fresh Bedrock client for each request (handles SSO token refresh)"""
+        # Read config fresh each time
+        aws_region = os.getenv("AWS_REGION", "us-east-1")
         aws_access_key = os.getenv("AWS_ACCESS_KEY_ID")
         aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-        aws_region = os.getenv("AWS_REGION", "us-east-1")
         
-        # Create Bedrock client
         try:
-            # If credentials are provided in .env, use them
             if aws_access_key and aws_secret_key:
-                self.client = boto3.client(
+                return boto3.client(
                     service_name="bedrock-runtime",
                     region_name=aws_region,
                     aws_access_key_id=aws_access_key,
                     aws_secret_access_key=aws_secret_key
                 )
-                logger.info(f"Bedrock client initialized with .env credentials for region: {aws_region}")
             else:
-                # Otherwise use default AWS credentials (from aws configure)
-                self.client = boto3.client(
+                # Use default AWS credentials (SSO/aws configure)
+                # Create a new session to get fresh credentials
+                session = boto3.Session()
+                return session.client(
                     service_name="bedrock-runtime",
                     region_name=aws_region
                 )
-                logger.info(f"Bedrock client initialized with default AWS credentials for region: {aws_region}")
         except Exception as e:
-            logger.error(f"Failed to initialize Bedrock client: {str(e)}")
-            self.client = None
-        
-        # Model configuration
-        self.model_id = os.getenv(
+            logger.error(f"Failed to create Bedrock client: {str(e)}")
+            return None
+    
+    @property
+    def model_id(self):
+        """Get model ID from environment"""
+        return os.getenv(
             "BEDROCK_MODEL_ID",
             "anthropic.claude-3-sonnet-20240229-v1:0"
         )

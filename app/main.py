@@ -4,11 +4,16 @@ from app.utils.image_processor import ImageProcessor
 from app.services.bedrock_service import BedrockService
 from dotenv import load_dotenv
 import logging
+import os
 from io import BytesIO
 from pathlib import Path
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
+
+# # Debug: Print AWS config
+# print(f"DEBUG: AWS_REGION = {os.getenv('AWS_REGION')}")
+# print(f"DEBUG: BEDROCK_MODEL_ID = {os.getenv('BEDROCK_MODEL_ID')}")
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
