@@ -98,26 +98,59 @@ with tab1:
         uploaded_file = st.file_uploader(
             "Choose a fashion image...",
             type=['jpg', 'jpeg', 'png'],
-            help="Upload a clear image of clothing or fashion item"
+            help="Upload a clear image of clothing or fashion item (min 200x200px, max 10MB)"
         )
+        
+        # Quality check variables
+        is_quality_ok = False
+        quality_issues = []
         
         if uploaded_file is not None:
             # Display uploaded image
             image = Image.open(uploaded_file)
             st.image(image, caption="Uploaded Image", use_container_width=True)
             
+            # Get image properties
+            width, height = image.size
+            file_size = uploaded_file.size
+            
+            # Quality validation
+            MIN_DIMENSION = 200
+            MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+            MIN_FILE_SIZE = 5 * 1024  # 5KB (likely too compressed)
+            
+            if width < MIN_DIMENSION or height < MIN_DIMENSION:
+                quality_issues.append(f"Resolution too low ({width}x{height}px). Minimum: {MIN_DIMENSION}x{MIN_DIMENSION}px")
+            
+            if file_size > MAX_FILE_SIZE:
+                quality_issues.append(f"File too large ({file_size / 1024 / 1024:.1f}MB). Maximum: 10MB")
+            
+            if file_size < MIN_FILE_SIZE:
+                quality_issues.append(f"File too small ({file_size / 1024:.1f}KB). Image may be too compressed.")
+            
+            is_quality_ok = len(quality_issues) == 0
+            
             # Image info
             st.markdown("**Image Details:**")
             st.write(f"- Format: {image.format}")
-            st.write(f"- Size: {image.size[0]} x {image.size[1]} pixels")
+            st.write(f"- Size: {width} x {height} pixels")
+            st.write(f"- File size: {file_size / 1024:.1f} KB")
             st.write(f"- Mode: {image.mode}")
+            
+            # Quality status
+            if is_quality_ok:
+                st.success("✅ Image quality OK")
+            else:
+                st.error("❌ Image quality issues:")
+                for issue in quality_issues:
+                    st.write(f"  • {issue}")
     
     with col2:
         st.markdown("### Analysis Results")
         
         if uploaded_file is not None:
-            # Analyze button
-            if st.button("🔍 Analyze Image", type="primary"):
+            # Analyze button - disabled if quality issues
+            if st.button("🔍 Analyze Image", type="primary", disabled=not is_quality_ok):
                 with st.spinner("Analyzing image with AI... This may take a few seconds."):
                     try:
                         # Reset file pointer
